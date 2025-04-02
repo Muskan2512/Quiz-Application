@@ -2,25 +2,40 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {Link} from "react-router-dom";
 import { IoIosArrowForward  } from "react-icons/io";
+import {login} from "../api/authAPI"
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("student");
+  const [role, setRole] = useState("user");
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    if (role === "teacher") {
-      navigate("/teacher");
-    } else {
-      navigate("/quiz");
-    }
-  };
+  const handleLogin = async (e) => {
+     e.preventDefault();
+     const userData = { username, password, role };
+     console.log(userData);
+     try {
+         const response = await login(userData); 
+        //  alert(response.message); // Show success message
+        //  console.log(response);
+        localStorage.setItem("token", response.token); 
+        localStorage.setItem("user",response.data.id)
+        //  console.log(response.data.id);
+ 
+         if (role === "admin") {
+             navigate("/admin");
+         } else {
+             navigate("/student");
+         }
+     } catch (error) {
+         console.log("Login failed: " + (error.response?.data?.message || error.message));
+     }
+ };
+ 
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6">
-    <Link to="/" className="absolute top-[1rem] right-[1.5rem] flex items-center hover:underline"><span>Home</span> <IoIosArrowForward /></Link>
+    {/* <Link to="/" className="absolute top-[1rem] right-[1.5rem] flex items-center hover:underline"><span>Home</span> <IoIosArrowForward /></Link> */}
       <h2 className="text-4xl font-bold mb-6">Login</h2>
       <form onSubmit={handleLogin} className="bg-white text-black p-6 rounded-lg shadow-lg w-80 md:w-100">
         <div className="mb-4">
@@ -49,8 +64,8 @@ const Login = () => {
             value={role} 
             onChange={(e) => setRole(e.target.value)} 
             className="w-full p-2 border border-gray-300 rounded">
-            <option value="student">Student</option>
-            <option value="teacher">Teacher</option>
+            <option value="user">user</option>
+            <option value="admin">admin</option>
           </select>
         </div>
         <button 

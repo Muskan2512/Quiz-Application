@@ -2,28 +2,36 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {Link} from "react-router-dom";
 import { IoIosArrowForward  } from "react-icons/io";
-
+import {signup} from "../api/authAPI"
 
 const Signup = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("student");
+  const [role, setRole] = useState("user");
   const navigate = useNavigate();
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-    // Simulate signup logic (e.g., API call)
-    if (role === "teacher") {
-      navigate("/teacher");
-    } else {
-      navigate("/quiz");
+    const userData = { username, email, password, role };
+    // console.log(userData);
+    try {
+        const response = await signup(userData); // ✅ Await API call
+        alert(response.message); // Show success message
+
+        if (role === "admin") {
+            navigate("/admin");
+        } else {
+            navigate("/student");
+        }
+    } catch (error) {
+        alert("Signup failed: " + (error.response?.data?.message || error.message));
     }
-  };
+};
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6">
-     <Link to="/" className="absolute top-[1rem] right-[1.5rem] flex items-center hover:underline"><span>Home</span> <IoIosArrowForward /></Link>
+     {/* <Link to="/" className="absolute top-[1rem] right-[1.5rem] flex items-center hover:underline"><span>Home</span> <IoIosArrowForward /></Link> */}
       <h2 className="text-4xl font-bold mb-6">Sign Up</h2>
       <form onSubmit={handleSignup} className="bg-white text-black p-6 rounded-lg shadow-lg w-80 md:w-100">
         <div className="mb-4">
@@ -62,8 +70,8 @@ const Signup = () => {
             value={role} 
             onChange={(e) => setRole(e.target.value)} 
             className="w-full p-2 border border-gray-300 rounded">
-            <option value="student">Student</option>
-            <option value="teacher">Teacher</option>
+            <option value="user">user</option>
+            <option value="admin">admin</option>
           </select>
         </div>
         <button 

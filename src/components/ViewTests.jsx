@@ -2,16 +2,25 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { IoMdArrowRoundForward } from "react-icons/io";
 
-const ViewTests = ({tests}) => {
+import { getAllTests } from "../api/testAPI";
+
+const ViewTests = () => {
   // console.log("tests in viewTest is:",tests)
   const [testList, setTestList] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (tests.length > 0) {
-      setTestList(tests); // Ensure state updates correctly
-    }
-  }, [tests]); // Re-run effect when `tests` updates
+    const fetchTests = async () => {
+        try {
+            const data = await getAllTests();
+            setTestList(data); // Store fetched tests
+        } catch (err) {
+            console.log(err.message);
+        }
+    };
+
+    fetchTests(); // Call the function on component mount
+}, []);
 
   const handleTestClick = (testId) => {
     navigate(`/attempt-test/${testId}`);

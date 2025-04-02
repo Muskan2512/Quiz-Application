@@ -1,53 +1,76 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { getTestById } from "../api/testAPI";
+import { setUserScore } from "../api/scoreAPI";
 
-const TestAttempt = ({ tests }) => {
+const TestAttempt = () => {
   const { id } = useParams(); // Get test ID from URL
+  const userId=localStorage.getItem("user")
+  // console.log(userId)
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [currentTest, setCurrentTest] = useState(null);
   const [score, setScore] = useState(null);
 
   useEffect(() => {
-    // Find the selected test based on ID
-    const test = tests.find((t) => t.id.toString() === id);
-    if (test) {
-      setCurrentTest(test);
-    }
-  }, [id, tests]);
+    const fetchTest = async () => {
+        try {
+            const data = await getTestById(id);
+            setCurrentTest(data);
+        } catch (err) {
+            alert("Failed to load test details. Please try again.");
+            console.log(err.message);
+        }
+    };
 
-  const handleAnswerChange = (questionIndex, optionIndex) => {
-    setSelectedAnswers({
-      ...selectedAnswers,
-      [questionIndex]: optionIndex,
-    });
-  };
+    fetchTest(); // Call function when component mounts
+}, [id]);
 
-  const evaluateScore = () => {
-    if (!currentTest) return;
+const handleAnswerChange = (questionIndex, optionIndex) => {
+  setSelectedAnswers({
+    ...selectedAnswers,
+    [questionIndex]: optionIndex,
+  });
+};
 
-    let totalScore = 0;
-    currentTest.questions.forEach((question, index) => {
-      // console.log("question is:",question.options);
-      // console.log("selected answer is:",question.options[selectedAnswers[index]]);
-      // console.log("correct answer is:",question.correctAnswer);
-      if (question.options[selectedAnswers[index]] === question.correctAnswer) {
-        totalScore++;
+
+
+//error because userid nahi mil raha because hame login karte hi use cookies ke form  mein bhejna tha..
+const evaluateScore = async () => { 
+  if (!currentTest) return;
+
+  let totalScore = 0;
+  currentTest.questions.forEach((question, index) => {
+      const selectedOptionIndex = selectedAnswers[index]; 
+      const selectedOption = [question.option_a, question.option_b, question.option_c, question.option_d][selectedOptionIndex]; 
+
+      if (selectedOption === question.correct_answer) {
+          totalScore+=10;
       }
-    });
-    // console.log("total score is:",totalScore);
-    setScore(totalScore);
-  };
+  });
+
+  setScore(totalScore);
+  // console.log(currentTest,currentTest.quiz,currentTest.quiz.id);
+
+  try {
+      // Call the API to update the score in the database
+      await setUserScore(userId, currentTest.quiz.id, totalScore);
+      console.log("Score updated successfully!");
+  } catch (error) {
+      console.error("Failed to update score:", error);
+  }
+};
+
    return (score !== null) ? (<div className="p-6   shadow-lg rounded-lg text-center ">
     <h2 className="text-3xl font-extrabold text-indigo-700">
-      🎉 Your Score: {score} / {currentTest.questions.length} 🎯
+      🎉 Your Score: {score} / {(currentTest.questions.length)*10} 🎯
     </h2>
   
     {/* Progress Bar */}
     <div className="w-[80%] mb-9 mx-auto bg-gray-200 rounded-full h-3 mt-4">
       <div 
-        className="bg-indigo-600 h-3 rounded-full transition-all" 
-        style={{ width: `${(score / currentTest.questions.length) * 100}%` }}
+        className="bg-indigo-300 h-3 rounded-full transition-all" 
+        style={{ width: `${(score /( (currentTest.questions.length)*10)) * 100}%` }}
       ></div>
     </div>
   
@@ -68,31 +91,33 @@ const TestAttempt = ({ tests }) => {
       {currentTest ? (
         <div className="bg-white shadow-xl rounded-lg p-6 w-full max-w-2xl">
           <h2 className="text-3xl font-extrabold text-gray-800 mb-6 text-center">
-            {currentTest.title}
+            {currentTest.quiz.title}
           </h2>
-          {currentTest.questions.map((question, qIndex) => (
+                    {currentTest.questions.map((question, qIndex) => (
             <div
               key={qIndex}
               className="mb-6 p-4 bg-gray-100 rounded-lg shadow-md border-l-4 border-indigo-500"
             >
-              <p className="text-lg font-semibold text-gray-800">{question.ques}</p>
+              <p className="text-lg font-semibold text-gray-800">{question.question_text}</p>
               <div className="mt-2 space-y-2">
-                {question.options.map((option, oIndex) => (
-                  <label
-                    key={oIndex}
-                    className="block bg-white p-3 rounded-md shadow-sm border cursor-pointer hover:bg-indigo-100 transition"
-                  >
-                    <input
-                      type="radio"
-                      name={`question-${qIndex}`}
-                      value={oIndex}
-                      checked={selectedAnswers[qIndex] === oIndex}
-                      onChange={() => handleAnswerChange(qIndex, oIndex)}
-                      className="mr-2"
-                    />
-                    {option}
-                  </label>
-                ))}
+                {[question.option_a, question.option_b, question.option_c, question.option_d].map(
+                  (option, oIndex) => (
+                    <label
+                      key={oIndex}
+                      className="block bg-white p-3 rounded-md shadow-sm border cursor-pointer hover:bg-indigo-100 transition"
+                    >
+                      <input
+                        type="radio"
+                        name={`question-${qIndex}`}
+                        value={oIndex}
+                        checked={selectedAnswers[qIndex] === oIndex}
+                        onChange={() => handleAnswerChange(qIndex, oIndex)}
+                        className="mr-2"
+                      />
+                      {option}
+                    </label>
+                  )
+                )}
               </div>
             </div>
           ))}

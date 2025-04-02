@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 
-const TeacherQuizCreation = ({handleSetTests}) => {
+import {createATest} from "../api/createTest"
+
+const TeacherQuizCreation = () => {
   const [title, setTitle] = useState("");
   const [numQuestions, setNumQuestions] = useState(0);
   const [questions, setQuestions] = useState([]);
@@ -11,23 +13,16 @@ const TeacherQuizCreation = ({handleSetTests}) => {
     setCurrentStep(1);
   };
 
-  const [tests, setTests] = useState(() => {
-      // Load saved tests from localStorage when the app starts
-      const savedTests = localStorage.getItem("tests");
-      return savedTests ? JSON.parse(savedTests) : [];
-    });
-
-  const handleQuestionSubmit = (e) => {
+  const handleQuestionSubmit = async(e) => {
     e.preventDefault();
     if (questions.length < numQuestions) {
       const newQuestion = {
-        ques: e.target.question.value,
-        options: [
-          e.target.option1.value,
-          e.target.option2.value,
-          e.target.option3.value,
-          e.target.option4.value,
-        ],
+        questionText: e.target.question.value,
+       
+        optionA:e.target.option1.value,
+        optionB:e.target.option2.value,
+        optionC:e.target.option3.value,
+        optionD:e.target.option4.value,
         correctAnswer: e.target.correctAnswer.value,
       };
 
@@ -35,28 +30,28 @@ const TeacherQuizCreation = ({handleSetTests}) => {
          // Update the question array first
     const updatedQuestions = [...questions, newQuestion];
     setQuestions(updatedQuestions);
-    console.log("Question array is", updatedQuestions);
+    // console.log("Number of questions is:",numQuestions);
+    // console.log("Title:",title);
+    // console.log("Question array is", updatedQuestions);
 
     // When all questions are added, store the test
     if (updatedQuestions.length === parseInt(numQuestions)) {
-      const newTest = {
-        id: tests.length + 1,
-        title, // Assuming you have a 'title' state for the test name
-        questions: updatedQuestions,
-      };
-
-      // Store in tests state
-      // setTests([...tests, newTest]);
-      handleSetTests(newTest);
-      // console.log("Updated tests array:", [...tests, newTest]);
-
-      setCurrentStep(2); // Move to the next step
+      setCurrentStep(2);
+      try {
+        // console.log("Creating test:", title, numQuestions, updatedQuestions);
+        await createATest(title, numQuestions, updatedQuestions);
+        // console.log("Test created successfully!");
+      } catch (error) {
+        console.error("Failed to create the test:", error);
+      }
     }
 
     e.target.reset();
     }
+
   };
 
+ 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 p-6">
       <h2 className="text-3xl font-bold mb-4 text-white">Create a Quiz</h2>
