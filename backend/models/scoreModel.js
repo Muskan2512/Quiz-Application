@@ -7,7 +7,7 @@ const Score = {
     },
 
     getScoresByUser: (userId, callback) => {
-        const sql = "SELECT quizzes.title, scores.score FROM scores JOIN quizzes ON scores.quiz_id = quizzes.id WHERE scores.user_id = ?";
+        const sql = "SELECT quizzes.title, scores.score, scores.created_at FROM scores JOIN quizzes ON scores.quiz_id = quizzes.id WHERE scores.user_id = ?";
         db.query(sql, [userId], callback);
     }
 };

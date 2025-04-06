@@ -1,12 +1,13 @@
 import { useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect,useContext } from "react";
 import { Link } from "react-router-dom";
 import { getTestById } from "../api/testAPI";
 import { setUserScore } from "../api/scoreAPI";
-
+import {ContextStore} from "../store/contextStore";
+import toast from "react-hot-toast"
 const TestAttempt = () => {
   const { id } = useParams(); // Get test ID from URL
-  const userId=localStorage.getItem("user")
+  const userId=useContext(ContextStore).userId
   // console.log(userId)
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [currentTest, setCurrentTest] = useState(null);
@@ -18,7 +19,7 @@ const TestAttempt = () => {
             const data = await getTestById(id);
             setCurrentTest(data);
         } catch (err) {
-            alert("Failed to load test details. Please try again.");
+            toast.error("Failed to load test details. Please try again.");
             console.log(err.message);
         }
     };
@@ -33,18 +34,18 @@ const handleAnswerChange = (questionIndex, optionIndex) => {
   });
 };
 
-
-
-//error because userid nahi mil raha because hame login karte hi use cookies ke form  mein bhejna tha..
 const evaluateScore = async () => { 
   if (!currentTest) return;
 
   let totalScore = 0;
   currentTest.questions.forEach((question, index) => {
-      const selectedOptionIndex = selectedAnswers[index]; 
-      const selectedOption = [question.option_a, question.option_b, question.option_c, question.option_d][selectedOptionIndex]; 
 
-      if (selectedOption === question.correct_answer) {
+    const selectedOptionIndex = selectedAnswers[index]; 
+    // console.log(selectedOptionIndex,index+1,question.correct_answer)
+    
+      // const selectedOption = [question.option_a, question.option_b, question.option_c, question.option_d][selectedOptionIndex]; 
+
+      if (selectedOptionIndex+1 === Number(question.correct_answer)) {
           totalScore+=10;
       }
   });
@@ -61,15 +62,15 @@ const evaluateScore = async () => {
   }
 };
 
-   return (score !== null) ? (<div className="p-6   shadow-lg rounded-lg text-center ">
-    <h2 className="text-3xl font-extrabold text-indigo-700">
+   return (score !== null) ? (<div className="p-6 rounded-lg text-center ">
+    <h2 className="text-3xl font-extrabold text-white">
       🎉 Your Score: {score} / {(currentTest.questions.length)*10} 🎯
     </h2>
   
     {/* Progress Bar */}
-    <div className="w-[80%] mb-9 mx-auto bg-gray-200 rounded-full h-3 mt-4">
+    <div className="w-[80%] mb-9 mx-auto bg-gray-600 rounded-full h-3 mt-4">
       <div 
-        className="bg-indigo-300 h-3 rounded-full transition-all" 
+        className="bg-white h-3 rounded-full transition-all" 
         style={{ width: `${(score /( (currentTest.questions.length)*10)) * 100}%` }}
       ></div>
     </div>

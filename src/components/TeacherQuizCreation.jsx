@@ -17,8 +17,7 @@ const TeacherQuizCreation = () => {
     e.preventDefault();
     if (questions.length < numQuestions) {
       const newQuestion = {
-        questionText: e.target.question.value,
-       
+        questionText: e.target.question.value,       
         optionA:e.target.option1.value,
         optionB:e.target.option2.value,
         optionC:e.target.option3.value,
@@ -88,7 +87,18 @@ const TeacherQuizCreation = () => {
           <input type="text" name="option3" className="w-full p-2 border border-gray-300 rounded mb-2" required />
           <input type="text" name="option4" className="w-full p-2 border border-gray-300 rounded mb-2" required />
           <label className="block mb-2 font-semibold">Correct Answer</label>
-          <input type="text" name="correctAnswer" className="w-full p-2 border border-gray-300 rounded mb-4" required />
+          <select
+  name="correctAnswer"
+  className="w-full p-2 border border-gray-300 rounded mb-4"
+  required
+>
+  <option value="">Select Correct Answer</option>
+  <option value="1">1</option>
+  <option value="2">2</option>
+  <option value="3">3</option>
+  <option value="4">4</option>
+</select>
+
           <button type="submit" className="bg-green-600 text-white w-full py-2 rounded font-semibold hover:bg-green-700">
             Add Question
           </button>

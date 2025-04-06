@@ -5,6 +5,6 @@ const {authMiddleWare}=require("../middleware/authMiddleware")
 const router = express.Router();
 
 router.post("/store", authMiddleWare,scoreController.storeScore);
-// router.get("/user/:userId",authMiddleWare, scoreController.getUserScores);
+router.get("/user/:userId", scoreController.getUserScores);
 
 module.exports = router;

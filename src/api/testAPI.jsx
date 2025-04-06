@@ -4,7 +4,7 @@ const token = localStorage.getItem("token");
 
 export const getAllTests = async () => {
     try {
-        console.log(token)
+        // console.log(token)
         const response = await axios.get(
             `${API_URL}/all`,
             {
@@ -23,6 +23,7 @@ export const getAllTests = async () => {
 
 export const getTestById = async (testId) => {
     try {
+        console.log(testId)
         const response = await axios.get(`${API_URL}/${testId}`,
             {
                 headers: {

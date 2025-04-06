@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {Link} from "react-router-dom";
-import { IoIosArrowForward  } from "react-icons/io";
 import {login} from "../api/authAPI"
+import toast from "react-hot-toast";
+import { ContextStore } from "../store/contextStore";
 
 const Login = () => {
+  const {token,setToken,userId,setUser}=useContext(ContextStore);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("user");
@@ -13,21 +15,24 @@ const Login = () => {
   const handleLogin = async (e) => {
      e.preventDefault();
      const userData = { username, password, role };
-     console.log(userData);
+    //  console.log(userData);
      try {
          const response = await login(userData); 
         //  alert(response.message); // Show success message
         //  console.log(response);
-        localStorage.setItem("token", response.token); 
-        localStorage.setItem("user",response.data.id)
-        //  console.log(response.data.id);
- 
-         if (role === "admin") {
-             navigate("/admin");
-         } else {
-             navigate("/student");
-         }
+         setToken(response.token)
+         setUser(response.data.id)
+         localStorage.setItem("token",response.token);
+         localStorage.setItem("user",response.data.id);
+
+        if (role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/student");
+        }
+        toast.success("Login successful!"); 
      } catch (error) {
+          toast.error((error.response?.data?.message || error.message));
          console.log("Login failed: " + (error.response?.data?.message || error.message));
      }
  };

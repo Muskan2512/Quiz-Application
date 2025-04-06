@@ -5,7 +5,6 @@ import { IoMdArrowRoundForward } from "react-icons/io";
 import { getAllTests } from "../api/testAPI";
 
 const ViewTests = () => {
-  // console.log("tests in viewTest is:",tests)
   const [testList, setTestList] = useState([]);
   const navigate = useNavigate();
 
@@ -13,6 +12,7 @@ const ViewTests = () => {
     const fetchTests = async () => {
         try {
             const data = await getAllTests();
+            console.log("All tests are:",data);
             setTestList(data); // Store fetched tests
         } catch (err) {
             console.log(err.message);

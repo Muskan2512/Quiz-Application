@@ -5,7 +5,6 @@ exports.authMiddleWare = (req, res, next) => {
   try {
     const token = req.body?.token || req.cookies?.token || req?.header("Authorization")?.replace("Bearer ", "");
 
-    // console.log("token is:",token)
     if (!token) {
       return res.status(401).json({
         status: false,
@@ -19,7 +18,7 @@ exports.authMiddleWare = (req, res, next) => {
     req.user = verifyToken;
     next();
   } catch (err) {
-    console.error("Token validation error:", err.message); // Log the actual error
+    // console.error("Token validation error:", err.message); // Log the actual error
     return res.status(401).json({
       status: false,
       message: "Error occurred while validating the token",

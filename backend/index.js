@@ -15,6 +15,7 @@ app.use(express.json()); // ✅ Parses JSON requests
 app.use(express.urlencoded({ extended: true })); // ✅ Parses URL-encoded data
 app.use(cookieParser()); // ✅ Enables reading cookies
 app.use(cors({ origin: "http://localhost:5173", credentials: true })); // ✅ Adjust frontend origin if needed
+// app.use(cors({ origin: "http://192.168.1.35:5173", credentials: true })); // ✅ Adjust frontend origin if needed
 
 
 app.use("/api/auth/v1",authRoutes);

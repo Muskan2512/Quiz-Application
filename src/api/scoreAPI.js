@@ -25,3 +25,14 @@ const response = await axios.post(`${API_URL}/store`,{
     throw error;
   }
 };
+
+
+export const fetchScores = async (userId) => {
+      try {
+        const response = await axios.get(`${API_URL}/user/${userId}`);
+        console.log("Response is:",response);
+        return response.data;
+      } catch (err) {
+       throw err;
+      }
+};

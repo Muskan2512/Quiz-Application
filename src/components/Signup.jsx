@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {Link} from "react-router-dom";
 import { IoIosArrowForward  } from "react-icons/io";
 import {signup} from "../api/authAPI"
-
+import toast from "react-hot-toast"
 const Signup = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -17,7 +17,7 @@ const Signup = () => {
     // console.log(userData);
     try {
         const response = await signup(userData); // ✅ Await API call
-        alert(response.message); // Show success message
+        toast.success(response.message); // Show success message
 
         if (role === "admin") {
             navigate("/admin");
@@ -25,7 +25,7 @@ const Signup = () => {
             navigate("/student");
         }
     } catch (error) {
-        alert("Signup failed: " + (error.response?.data?.message || error.message));
+        toast.error("Signup failed: " + (error.response?.data?.message || error.message));
     }
 };
 

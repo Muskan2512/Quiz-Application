@@ -1,6 +1,6 @@
 import axios from "axios";
 const API_URL = "http://localhost:5000/api/quiz/v1"; // Your backend URL
-const token = localStorage.getItem("token");
+const token=localStorage.getItem("token")
 
 export const createATest = async (title, numQuestions, questions ) => {
     try {

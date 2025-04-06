@@ -16,6 +16,14 @@ const authController = {
             return res.status(400).json({ message: "Invalid role. Allowed values: 'admin', 'user'" });
         }
 
+        if (role === "admin") {
+        // Allow only one predefined admin user
+            if (username !== "ds") {
+                return res.status(403).json({ message: "Not allowed to create account as Admin" });
+            }
+        }
+
+
         User.getUserByUsername(username, (err, results) => {
             if (err) return res.status(500).json({ message: "Database error", error: err });
             if (results.length > 0) {
@@ -39,6 +47,12 @@ const authController = {
 
         if (!username || !password || !role) {
             return res.status(400).json({ message: "All fields are required" });
+        }
+        if (role === "admin") {
+        // Allow only one predefined admin user
+            if (username !== "ds") {
+                return res.status(403).json({ message: "Only the designated admin can log in as admin" });
+            }
         }
 
         User.getUserByUsername(username, (err, results) => {
